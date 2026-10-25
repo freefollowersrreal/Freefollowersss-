@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Instagram Followers & Coins</title>
+<style>
+*{box-sizing:border-box}
+:root{--pink:#ff3c91;--purple:#9b45ff;--gold:#ffd86b}
+body{margin:0;min-height:100vh;font-family:Arial,sans-serif;color:#fff;background:radial-gradient(ellipse at top,#42115f 0%,#170d2b 48%,#080711 100%);overflow-x:hidden}
+header{text-align:center;padding:25px 14px 12px}
+.logo{height:68px;width:68px;margin:0 auto 12px;display:grid;place-items:center;border-radius:21px;font-size:36px;background:linear-gradient(135deg,#ffbf4a,#ff3c91,#963cff);box-shadow:0 0 30px #ff3c9180;animation:float 2.5s ease-in-out infinite}
+h1{font-size:clamp(25px,6vw,34px);margin:5px 0;background:linear-gradient(90deg,#ffe17c,#ff7bc5,#c4a3ff);-webkit-background-clip:text;color:transparent}
+header p{font-size:13px;color:#d8c5eb}
+.topbar{width:92%;max-width:470px;margin:18px auto;display:flex;gap:10px;align-items:stretch}
+.balance{flex:1;min-width:0;padding:14px;border-radius:17px;border:1px solid #ffffff25;background:#ffffff0d;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.balance-label{font-size:11px;color:#d4c2e6}
+#coins{font-size:24px;font-weight:800;color:var(--gold);display:inline-block}
+.coin-icon{font-size:27px;animation:spin 4s linear infinite}
+.getcoins{width:116px;border:0;border-radius:17px;color:#24102c;font-weight:800;font-size:14px;background:linear-gradient(135deg,#ffe782,#ffb72f);box-shadow:0 0 20px #ffd86b55;cursor:pointer;animation:pulse 2s infinite}
+.container{width:92%;max-width:470px;margin:18px auto 28px;display:grid;gap:15px}
+.card{padding:19px;border-radius:21px;border:1px solid #ffffff20;background:linear-gradient(145deg,#ffffff14,#ffffff06);box-shadow:0 8px 25px #0004;transition:transform .25s,border-color .25s;position:relative}
+.card:hover{transform:translateY(-3px);border-color:#dc76ff}
+.cardtop{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.count{font-size:23px;font-weight:800}
+.tag{font-size:10px;letter-spacing:.5px;padding:7px 9px;border-radius:20px;background:#b52bff35;color:#efd9ff;white-space:nowrap}
+.cost{margin:14px 0 9px;color:var(--gold);font-weight:bold}
+.status{display:inline-block;margin:0 0 13px;padding:7px 10px;border-radius:20px;font-size:12px;font-weight:bold}
+.available{color:#9affce;background:#20ce7920;border:1px solid #5cffad55}
+.unavailable{color:#ffb5cb;background:#ff287c18;border:1px solid #ff72c655}
+.btn{width:100%;border:0;border-radius:13px;padding:14px;background:linear-gradient(100deg,var(--pink),var(--purple));color:white;font-size:15px;font-weight:800;cursor:pointer;box-shadow:0 5px 18px #c42cff40;transition:.2s}
+.btn:active{transform:scale(.97)}
+.btn:disabled{background:#4b4057;color:#aaa2b4;box-shadow:none;cursor:not-allowed;opacity:.8}
+.note{text-align:center;color:#b9a8cc;font-size:11px;line-height:1.7;padding:0 18px 25px}
+.overlay{display:none;position:fixed;inset:0;z-index:10;background:#080511ed;align-items:center;justify-content:center;padding:16px}
+.modal{width:100%;max-width:400px;max-height:90vh;overflow:auto;padding:23px 19px;text-align:center;border-radius:24px;background:linear-gradient(145deg,#2c1445,#120c22);border:1px solid #c45cff75;box-shadow:0 0 38px #a92bff35;animation:pop .28s ease}
+.modal h2{font-size:23px;color:#ffb4e4;margin:10px 0}
+.modal p{color:#d9cce8;font-size:13px;line-height:1.6}
+input{width:100%;padding:14px;margin:13px 0;border:1px solid #b05cff;border-radius:12px;background:#100a1d;color:white;font-size:16px;outline:none}
+.secondary{background:#ffffff12;box-shadow:none;margin-top:9px}
+.small{font-size:11px!important;color:#b9a8c9!important}
+#step2,#result{display:none}
+.grid7{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px;margin:17px 0}
+.day{padding:13px 8px;border-radius:14px;background:#ffffff0c;border:1px solid #ffffff18;min-height:90px;display:flex;flex-direction:column;justify-content:center;gap:6px}
+.day strong{font-size:13px}.day span{font-size:19px;color:var(--gold)}
+.day.claimed{border-color:#58f3b0;background:#24d68c18}
+.day.today{border-color:#ffd86b;box-shadow:0 0 14px #ffd86b30}
+.day.locked{opacity:.55}
+.trophy{font-size:54px;animation:bounce 1s infinite alternate}
+#toast{position:fixed;z-index:30;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;pointer-events:none;background:#241339;border:1px solid #ffd86b80;padding:12px 18px;border-radius:13px;box-shadow:0 0 20px #a52cff55;transition:.3s;text-align:center;font-size:13px;width:max-content;max-width:90%}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:20}
+@keyframes spin{to{transform:rotateY(360deg)}}
+@keyframes float{50%{transform:translateY(-5px)}}
+@keyframes pulse{50%{transform:scale(1.035);box-shadow:0 0 28px #ffd86b80}}
+@keyframes pop{from{transform:scale(.84);opacity:0}to{transform:scale(1);opacity:1}}
+@keyframes bounce{to{transform:translateY(-8px) scale(1.05)}}
+@media(min-width:430px){.grid7{grid-template-columns:repeat(4,minmax(0,1fr))}}
+</style>
+</head>
+<body>
+<canvas id="confetti"></canvas>
+<header>
+ <div class="logo">📸</div>
+ <h1>Instagram Followers</h1>
+ <p>✨ Rewards · Daily Coins · Special Offers ✨</p>
+</header>
+
+<div class="topbar">
+ <div class="balance">
+  <div><div class="balance-label">YOUR COIN BALANCE</div><div><span id="coins">1,000</span> <span style="color:#ffd86b;font-size:12px">coins</span></div></div>
+  <div class="coin-icon">🪙</div>
+ </div>
+ <button class="getcoins" onclick="openDaily()">🪙 GET COINS</button>
+</div>
+
+<div class="container" id="offers"></div>
+<div class="note">Coins and reward screens are a visual website feature. This page does not connect to Instagram or deliver real followers. Never share your password or OTP.</div>
+
+<div class="overlay" id="overlay">
+ <div class="modal">
+  <div id="step1">
+   <div style="font-size:34px">📱</div><h2>Enter Instagram Username</h2>
+   <p>Select your reward: <b id="chosen"></b></p>
+   <input id="username" placeholder="@yourusername" maxlength="30" autocomplete="off">
+   <button class="btn" onclick="nextStep()">NEXT ➜</button>
+   <button class="btn secondary" onclick="closeModal()">CANCEL</button>
+   <p class="small">Username only. Password aur OTP kabhi na dein.</p>
+  </div>
+  <div id="step2">
+   <div style="font-size:35px">🔎</div><h2>Confirm Your Reward</h2>
+   <p id="summary"></p>
+   <button class="btn" onclick="confirmReward()">CONFIRM 🎉</button>
+   <button class="btn secondary" onclick="backStep()">← BACK</button>
+  </div>
+  <div id="result">
+   <div class="trophy">🎉</div><h2>Congratulations!</h2>
+   <p id="successText"></p>
+   <p class="small">Yeh visual interface hai; real followers send nahi hote.</p>
+   <button class="btn" onclick="closeModal()">DONE 💜</button>
+  </div>
+  <div id="daily" style="display:none">
+   <div style="font-size:35px">🪙</div><h2>7-Day Daily Login</h2>
+   <p>Har din login reward claim karein aur har claim par <b style="color:#ffd86b">10 coins</b> paayein.</p>
+   <div class="grid7" id="days"></div>
+   <button class="btn" id="claimBtn" onclick="claimDaily()">GET TODAY'S 10 COINS 🎁</button>
+   <button class="btn secondary" onclick="closeModal()">CLOSE</button>
+   <p class="small">Daily rewards is browser par save hote hain. Yeh website feature hai, real Instagram reward nahi.</p>
+  </div>
+ </div>
+</div>
+<div id="toast"></div>
+
+<script>
+const rewards=[
+ {count:"10K",coins:1000,tag:"STARTER"},
+ {count:"20K",coins:2000,tag:"POPULAR"},
+ {count:"50K",coins:5000,tag:"HOT 🔥"},
+ {count:"100K",coins:9000,tag:"MEGA 👑"}
+];
+const savedBalance=localStorage.getItem("igCoinsBalanceV2");
+let balance=savedBalance===null ? 1000 : Number(savedBalance);
+if(!Number.isFinite(balance)||balance<0) balance=1000;
+let selected=null;
+let claimedDays=JSON.parse(localStorage.getItem("igDailyClaims")||"[]");
+const offers=document.getElementById("offers");
+function saveBalance(){localStorage.setItem("igCoinsBalanceV2",String(balance));updateBalance()}
+function updateBalance(){document.getElementById("coins").textContent=balance.toLocaleString();renderOffers()}
+function renderOffers(){
+ offers.innerHTML="";
+ rewards.forEach((r,i)=>{
+  const canAfford=Number(balance)>=Number(r.coins);
+  const card=document.createElement("div");card.className="card";
+  card.innerHTML=`<div class="cardtop"><div class="count">👥 ${r.count} Followers</div><div class="tag">${r.tag}</div></div>
+  <div class="cost">🪙 ${r.coins.toLocaleString()} Coins</div>
+  <div class="status ${canAfford?'available':'unavailable'}">${canAfford?'✅ Coins Available':'🔒 Coins Not Available'}</div>
+  <button class="btn" ${canAfford?'':'disabled'} onclick="openReward(${i})">${canAfford?'GET '+r.count+' FOLLOWERS ✨':'COINS NOT AVAILABLE 🔒'}</button>`;
+  offers.appendChild(card);
+ });
+}
+function showModal(section){
+ document.getElementById("overlay").style.display="flex";
+ ["step1","step2","result","daily"].forEach(id=>document.getElementById(id).style.display=id===section?"block":"none");
+}
+function openReward(i){
+ if(balance<rewards[i].coins){showToast("🪙 Coins Not Available — daily coins claim karein!");return}
+ selected=rewards[i];document.getElementById("chosen").textContent=selected.count+" Followers";
+ document.getElementById("username").value="";showModal("step1");
+}
+function nextStep(){
+ const u=document.getElementById("username").value.trim().replace(/^@/,"");
+ if(!/^[a-zA-Z0-9._]{1,30}$/.test(u)){alert("Valid Instagram username enter karein.");return}
+ document.getElementById("username").value="@"+u;
+ document.getElementById("summary").innerHTML="Username: <b>"+escapeHTML("@"+u)+"</b><br><br>Reward: <b>"+selected.count+" Followers</b><br>Cost: 🪙 <b>"+selected.coins.toLocaleString()+" coins</b><br><br>Confirm this reward selection?";
+ showModal("step2");
+}
+function escapeHTML(s){return s.replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function backStep(){showModal("step1")}
+function confirmReward(){
+ if(!selected||balance<selected.coins){showToast("Not enough coins!");showModal("daily");renderDaily();return}
+ balance-=selected.coins;saveBalance();renderOffers();
+ document.getElementById("successText").innerHTML="Congratulations 🎉<br><b>"+selected.count+" followers request complete ✅</b><br><br>24 hours wait kariye.";
+ showModal("result");burstConfetti();
+}
+function closeModal(){document.getElementById("overlay").style.display="none"}
+function openDaily(){renderDaily();showModal("daily")}
+function todayKey(){const d=new Date();return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
+function renderDaily(){
+ const days=document.getElementById("days");days.innerHTML="";
+ const today=todayKey();
+ for(let i=1;i<=7;i++){
+  const isClaimed=claimedDays.includes(i+"@"+today);
+  const el=document.createElement("div");el.className="day "+(isClaimed?"claimed":i===1?"today":"locked");
+  el.innerHTML=`<strong>DAY ${i}</strong><span>${isClaimed?"✅":"🪙"}</span><b>+10 Coins</b>`;
+  days.appendChild(el);
+ }
+ const done=claimedDays.includes("1@"+today);
+ const btn=document.getElementById("claimBtn");
+ btn.disabled=done;btn.textContent=done?"✅ TODAY'S COINS CLAIMED":"GET TODAY'S 10 COINS 🎁";
+}
+function claimDaily(){
+ const key="1@"+todayKey();
+ if(claimedDays.includes(key)){showToast("Aaj ke coins pehle hi claim ho chuke hain!");return}
+ claimedDays.push(key);localStorage.setItem("igDailyClaims",JSON.stringify(claimedDays));
+ balance=Number(balance)+10;saveBalance();renderDaily();renderOffers();burstConfetti();coinBurst();
+ showToast("🎉 +10 coins added to your balance!");
+}
+function showToast(message){
+ const t=document.getElementById("toast");t.textContent=message;t.classList.add("show");
+ setTimeout(()=>t.classList.remove("show"),2600);
+}
+function coinBurst(){
+ const el=document.querySelector(".coin-icon");el.animate([{transform:"scale(1) rotate(0deg)"},{transform:"scale(1.8) rotate(25deg)"},{transform:"scale(1) rotate(0deg)"}],{duration:700,easing:"ease-out"});
+ const n=document.getElementById("coins");n.animate([{transform:"scale(1)",color:"#ffd86b"},{transform:"scale(1.4)",color:"#7dffbc"},{transform:"scale(1)",color:"#ffd86b"}],{duration:800});
+}
+function burstConfetti(){
+ const c=document.getElementById("confetti"),ctx=c.getContext("2d");c.width=innerWidth;c.height=innerHeight;
+ const pieces=Array.from({length:120},()=>({x:Math.random()*c.width,y:-Math.random()*c.height,s:3+Math.random()*6,v:2+Math.random()*5,color:["#ff55a5","#ffdf66","#b86bff","#58f3d0"][Math.floor(Math.random()*4)]}));
+ let frame=0;function draw(){ctx.clearRect(0,0,c.width,c.height);pieces.forEach(p=>{ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,p.s,p.s*1.6);p.y+=p.v;p.x+=Math.sin(p.y/20)});if(++frame<120)requestAnimationFrame(draw);else ctx.clearRect(0,0,c.width,c.height)}draw();
+}
+window.addEventListener("resize",()=>{const c=document.getElementById("confetti");c.width=innerWidth;c.height=innerHeight});
+renderOffers();
+</script>
+</body>
+</html>
